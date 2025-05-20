@@ -1,0 +1,4 @@
+docker-compose.yml
+nginx/
+node_modules/
+.env
