@@ -8,12 +8,21 @@ use Illuminate\Http\Request;
 class ProjectController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Show public project list for general users.
+     */
+    public function publicIndex()
+    {
+        $projects = Project::all();
+        return view('projects.public', compact('projects'));
+    }
+
+    /**
+     * Display a listing of the resource for admin (must login).
      */
     public function index()
     {
         $projects = Project::all();
-    return view('projects.index', compact('projects'));
+        return view('projects.index', compact('projects'));
     }
 
     /**
@@ -30,12 +39,13 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-        'title' => 'required',
-        'description' => 'required',
-    ]);
+            'title' => 'required',
+            'description' => 'required',
+        ]);
 
-    Project::create($request->only('title', 'description'));
-    return redirect()->route('projects.index')->with('success', 'Created!');
+        Project::create($request->only('title', 'description'));
+
+        return redirect()->route('projects.index')->with('success', 'Created!');
     }
 
     /**
@@ -43,7 +53,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-         return view('projects.show', compact('project'));
+        return view('projects.show', compact('project'));
     }
 
     /**
@@ -60,12 +70,13 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project)
     {
         $request->validate([
-        'title' => 'required',
-        'description' => 'required',
-    ]);
+            'title' => 'required',
+            'description' => 'required',
+        ]);
 
-    $project->update($request->only('title', 'description'));
-    return redirect()->route('projects.index')->with('success', 'Updated!');
+        $project->update($request->only('title', 'description'));
+
+        return redirect()->route('projects.index')->with('success', 'Updated!');
     }
 
     /**
@@ -74,6 +85,7 @@ class ProjectController extends Controller
     public function destroy(Project $project)
     {
         $project->delete();
-    return redirect()->route('projects.index')->with('success', 'Deleted!');
+
+        return redirect()->route('projects.index')->with('success', 'Deleted!');
     }
 }
