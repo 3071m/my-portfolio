@@ -12,12 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('projects', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->text('description');
-            $table->string('image')->nullable();
-            $table->timestamps();
-        });
+        $table->id();
+        $table->string('title');
+        $table->text('description');
+        $table->string('image')->nullable();
+        $table->string('link')->nullable(); // ลิงก์ผลงาน
+        $table->date('date')->nullable();   // วันที่ทำโปรเจกต์
+        $table->text('technologies')->nullable(); // เทคโนโลยีที่ใช้ (เก็บเป็นข้อความ)
+        $table->timestamps();
+    });
+
     }
 
     /**
@@ -27,4 +31,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('projects');
     }
-};
+    };

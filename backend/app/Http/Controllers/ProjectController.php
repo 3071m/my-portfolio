@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
@@ -17,11 +18,20 @@ class ProjectController extends Controller
     }
 
     /**
+     * Show single project for public users.
+     */
+    public function publicShow($id)
+    {
+        $project = Project::findOrFail($id);
+        return view('projects.publicshow', compact('project'));
+    }
+
+    /**
      * Display a listing of the resource for admin (must login).
      */
     public function index()
     {
-        $projects = Project::all();
+        $projects = Project::paginate(10)->withQueryString(); // ใช้ paginate แทน all และตามด้วย withQueryString()
         return view('projects.index', compact('projects'));
     }
 
@@ -39,11 +49,21 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required',
-            'description' => 'required',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'link' => 'nullable|url|max:255',
+            'date' => 'nullable|date',
+            'technologies' => 'nullable|string',
+            'image' => 'nullable|image|max:2048',
         ]);
 
-        Project::create($request->only('title', 'description'));
+        $data = $request->only('title', 'description', 'link', 'date', 'technologies');
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('projects', 'public');
+        }
+
+        Project::create($data);
 
         return redirect()->route('projects.index')->with('success', 'Created!');
     }
@@ -70,11 +90,25 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project)
     {
         $request->validate([
-            'title' => 'required',
-            'description' => 'required',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'link' => 'nullable|url|max:255',
+            'date' => 'nullable|date',
+            'technologies' => 'nullable|string',
+            'image' => 'nullable|image|max:2048',
         ]);
 
-        $project->update($request->only('title', 'description'));
+        $data = $request->only('title', 'description', 'link', 'date', 'technologies');
+
+        if ($request->hasFile('image')) {
+            // ลบไฟล์รูปภาพเก่าถ้ามี
+            if ($project->image) {
+                Storage::disk('public')->delete($project->image);
+            }
+            $data['image'] = $request->file('image')->store('projects', 'public');
+        }
+
+        $project->update($data);
 
         return redirect()->route('projects.index')->with('success', 'Updated!');
     }
@@ -84,6 +118,9 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
+        if ($project->image) {
+            Storage::disk('public')->delete($project->image);
+        }
         $project->delete();
 
         return redirect()->route('projects.index')->with('success', 'Deleted!');

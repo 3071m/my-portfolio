@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 // 🔸 หน้าแรกให้ผู้ใช้ทั่วไปเข้าชมผลงาน
 Route::get('/', [ProjectController::class, 'publicIndex'])->name('projects.public');
+Route::get('/public-projects/{project}', [ProjectController::class, 'publicShow'])->name('projects.publicshow');
 
 // 🔒 กลุ่ม Route สำหรับ Admin (ต้อง login ก่อน)
 Route::middleware(['auth'])->group(function () {

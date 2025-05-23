@@ -4,15 +4,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-
 class Project extends Model
 {
     use HasFactory;
 
-    // กำหนดฟิลด์ที่สามารถกรอกข้อมูลได้ (mass assignable)
     protected $fillable = [
         'title',
         'description',
-        'url',
+        'image',
+        'link',
+        'date',
+        'technologies',
+    ];
+
+    // บอกให้ Laravel แปลง field 'date' เป็น date object (Carbon)
+    protected $casts = [
+        'date' => 'date',
     ];
 }
+
